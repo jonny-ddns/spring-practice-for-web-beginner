@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/tx
+						http://www.springframework.org/schema/tx/spring-tx.xsd">
+	<!--
+		#db 연동 설정
+		dataSource 를 사용해 커넥션하기. 
+		dataSource 를 스프링 빈으로 등록
+		db 연동 기능을 구현한 빈 객체를 dataSource를 주입받아 사용하기
+		jdbc 드라이버 클래스, jdbc url, id, pw
+ 	-->	 	
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl" value="jdbc:mysql://localhost/spring4fs?characterEncoding=utf8" />
+		<property name="user" value="spring4" />
+		<property name="password" value="spring4" />		
+	</bean>						
+	
+	<!-- dataSource 주입코드 -->
+	<bean id="memberDaoJdbc" class="spring.dao.MemberDaoJDBC">
+		<constructor-arg ref="dataSource" />
+	</bean>
+	
+	<!-- Transaction --> 
+	<!-- 
+		1) PlatformTransactionalManager 빈 설정 -> 
+		2) @Transactional 애노테이션 활성화
+	-->
+	<!-- PlatformTransactionalManager = 트랜잭션 관리자를 위한 인터페이스 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />	
+	</bean>
+	
+	<!-- 트랜잭션 애노테이션이 붙은 메서드를 트랜잭션 범위에서 실행하는 기능 활성화 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	
+	<bean id="changePasswordService" class="spring.service.ChangePasswordService">
+		<constructor-arg ref="memberDaoJdbc" />	
+	</bean>	
+</beans>
