@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/mvc
+						http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+	
+	<mvc:view-controller path="/main" view-name="main"/>
+
+	<bean class="controller.RegisterController">
+		<property name="memberRegisterService" ref="memberRegSvc" />
+	</bean>
+	
+	<bean class="controller.SurveyController" />
+	
+ 	<bean class="controller.LoginController" >
+		<property name="authService" ref="authService" />
+	</bean>
+	
+	<bean class="controller.LogoutController" />
+	
+	<bean class="controller.ChangePwdController" >
+		<property name="changePasswordService" ref="changePwdSvc" />
+	</bean>
+	
+	<!-- 인터셉터 handler 설정 -->
+	<!-- 인터셉터 빈 등록 및 적용할 경로 설정 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/edit/**"/>
+			<bean class="interceptor.AuthCheckInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+</beans>
